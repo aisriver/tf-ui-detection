@@ -5,11 +5,11 @@
 作者: 廖军
 Date: 2020-12-12 23:18:10
 LastEditors: 廖军
-LastEditTime: 2020-12-13 23:15:26
+LastEditTime: 2020-12-14 22:58:13
 '''
 import os 
+import cv2
 import tensorflow as tf 
-from PIL import Image
 from object_detection.utils import dataset_util
 
 # 获取当前地址
@@ -23,11 +23,8 @@ for index, name in enumerate(classes):
     for img_index, img_name in enumerate(os.listdir(class_path)):
         # 构建出每组数据的地址
         img_path = class_path + img_name
-
-        img = Image.open(img_path)
-        img = img.resize((300, 300))
-        # 将图片转化为二进制的格式
-        img_raw = img.tobytes()
+        image = cv2.imread(img_path)
+        image_encode_data = cv2.imencode('.jpg', image)[1].tostring()
 
         # example对象对label和image数据进行封装
         example = tf.train.Example(
@@ -35,9 +32,9 @@ for index, name in enumerate(classes):
                 feature={
                     "label": dataset_util.bytes_feature(name.encode()),
                     "index": dataset_util.int64_feature(index),
-                    "img_name": dataset_util.bytes_feature(img_name.encode()),
-                    "img_index": dataset_util.int64_feature(img_index),
-                    'img_raw': dataset_util.bytes_feature(img_raw),
+                    "image/name": dataset_util.bytes_feature(img_name.encode()),
+                    "image/index": dataset_util.int64_feature(img_index),
+                    'image/encoded': dataset_util.bytes_feature(image_encode_data),
                 }
             )
         )
