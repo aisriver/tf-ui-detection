@@ -1,0 +1,19 @@
+{
+	"name": "tf-ui-detection",
+	"version": "1.0.0",
+	"description": "基于tensorflow的UI对象识别",
+	"main": "index.js",
+	"keywords": [
+		"tensorflow",
+		"object",
+		"detection",
+		"javascript",
+		"ui"
+	],
+	"scripts": {
+		"tfrecords:create": "cd ./dataset_tools && python3 create_ui_tf_record.py",
+		"training": "python3 model_main_tf2.py --pipeline_config_path=./models/ui_detection_model/model.config --model_dir=./models/ui_detection_model --alsologtostderr"
+	},
+	"author": "廖君",
+	"license": "ISC"
+}
