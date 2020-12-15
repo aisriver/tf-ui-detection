@@ -14,7 +14,8 @@
 		"tfrecords:create": "cd ./dataset_tools && python3 create_ui_tf_record.py",
 		"training": "python3 model_main_tf2.py --pipeline_config_path=./models/ui_detection_model/model.config --model_dir=./models/ui_detection_model --alsologtostderr",
 		"tensorboard": "tensorboard --logdir models/ui_detection_model",
-		"export": "python3 exporter_main_v2.py --input_type=image_tensor --pipeline_config_path=./models/ui_detection_model/model.config --trained_checkpoint_dir=./models/ui_detection_model --output_directory=./output"
+		"export": "python3 exporter_main_v2.py --input_type=image_tensor --pipeline_config_path=./models/ui_detection_model/model.config --trained_checkpoint_dir=./models/ui_detection_model --output_directory=./output",
+		"transform": "tensorflowjs_converter --input_format=tf_saved_model --output_node_names='output' --saved_model_tags=serve ./output/saved_model ./output/web_model"
 	},
 	"author": "廖君",
 	"license": "ISC"
