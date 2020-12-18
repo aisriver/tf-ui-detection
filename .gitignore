@@ -6,4 +6,4 @@ node_modules/
 **/resnet101.ckpt-1.data-*
 **/ckpt-*.data-*
 **/variables.data-*
-**/web_model
+**/.yalc
