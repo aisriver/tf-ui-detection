@@ -11,11 +11,24 @@
 		"ui"
 	],
 	"scripts": {
-		"tfrecords:create": "cd ./dataset_tools && python3 create_ui_tf_record.py",
-		"training": "python3 model_main_tf2.py --pipeline_config_path=./models/ui_detection_model/model.config --model_dir=./models/ui_detection_model --alsologtostderr",
-		"tensorboard": "tensorboard --logdir models/ui_detection_model",
-		"export": "python3 exporter_main_v2.py --input_type=image_tensor --pipeline_config_path=./models/ui_detection_model/model.config --trained_checkpoint_dir=./models/ui_detection_model --output_directory=./output",
-		"transform": "tensorflowjs_converter --input_format=tf_saved_model --output_node_names='output' --saved_model_tags=serve ./output/saved_model ./output/web_model"
+		"records:coco": "ts-node scripts/records_coco.ts",
+		"training:coco_v1": "ts-node scripts/training_coco_v1.ts",
+		"export:coco_v1": "ts-node scripts/export_coco_v1.ts",
+		"transform:coco_v1": "ts-node scripts/transform_coco_v1.ts",
+		"tensorboard:coco_v1": "tensorboard --logdir models/v1_model",
+		"training:coco_v2": "ts-node scripts/training_coco_v2.ts",
+		"evaluation:coco_v2": "ts-node scripts/evaluation_coco_v2.ts",
+		"tensorboard:coco_v2": "tensorboard --logdir models/ui_detection_model",
+		"export:coco_v2": "ts-node scripts/export_coco_v2.ts",
+		"transform:coco_v2": "ts-node scripts/transform_coco_v2.ts"
+	},
+	"devDependencies": {
+		"@types/node": "^14.14.14",
+		"babel-core": "~6.26.0",
+		"babel-plugin-transform-runtime": "~6.23.0",
+		"ts-node": "~8.8.2",
+		"tslint": "~5.18.0",
+		"typescript": "~3.5.3"
 	},
 	"author": "廖君",
 	"license": "ISC"

@@ -1,3 +1,11 @@
+/*
+ * @文件描述:
+ * @公司: thundersdata
+ * @作者: 廖军
+ * @Date: 2020-12-17 22:59:35
+ * @LastEditors: 廖军
+ * @LastEditTime: 2021-01-01 11:57:34
+ */
 /**
  * @license
  * Copyright 2019 Google LLC. All Rights Reserved.
@@ -36,7 +44,7 @@ describeWithFlags('ObjectDetection', NODE_ENVS, () => {
 		const x = tf.zeros([227, 227, 3]);
 		const numOfTensorsBefore = tf.memory().numTensors;
 
-		await objectDetection.detect(x as tf.Tensor3D, 1);
+		await objectDetection.detect(x as tf.Tensor3D, { maxNumBoxes: 1 });
 
 		expect(tf.memory().numTensors).toEqual(numOfTensorsBefore);
 	});
@@ -46,7 +54,7 @@ describeWithFlags('ObjectDetection', NODE_ENVS, () => {
 		const objectDetection = await load();
 		const x = tf.zeros([227, 227, 3]);
 
-		await objectDetection.detect(x as tf.Tensor3D, 1);
+		await objectDetection.detect(x as tf.Tensor3D, { maxNumBoxes: 1 });
 		x.dispose();
 		objectDetection.dispose();
 		expect(tf.memory().numTensors).toEqual(numOfTensorsBefore);
@@ -56,7 +64,7 @@ describeWithFlags('ObjectDetection', NODE_ENVS, () => {
 		const objectDetection = await load();
 		const x = tf.zeros([227, 227, 3]);
 
-		const data = await objectDetection.detect(x as tf.Tensor3D, 1);
+		const data = await objectDetection.detect(x as tf.Tensor3D, { maxNumBoxes: 1 });
 
 		expect(data).toEqual([{ bbox: [227, 227, 0, 0], class: 'button', score: 1 }]);
 	});

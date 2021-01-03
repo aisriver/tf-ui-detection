@@ -7,3 +7,5 @@ node_modules/
 **/ckpt-*.data-*
 **/variables.data-*
 **/.yalc
+__pycache__
+models

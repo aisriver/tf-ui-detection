@@ -1,3 +1,11 @@
+/*
+ * @文件描述:
+ * @公司: thundersdata
+ * @作者: 廖军
+ * @Date: 2020-12-17 22:59:35
+ * @LastEditors: 廖军
+ * @LastEditTime: 2021-01-01 12:19:42
+ */
 /**
  * @license
  * Copyright 2019 Google LLC. All Rights Reserved.
@@ -22,19 +30,34 @@ export interface ObjectDetectionClass {
 }
 
 export const CLASSES: { [key: string]: ObjectDetectionClass } = {
+	// 1: {
+	// 	name: 'button',
+	// 	id: 1,
+	// 	displayName: 'button',
+	// },
+	// 2: {
+	// 	name: 'input',
+	// 	id: 2,
+	// 	displayName: 'input',
+	// },
+	// 3: {
+	// 	name: 'select',
+	// 	id: 3,
+	// 	displayName: 'select',
+	// },
 	1: {
-		name: 'button',
+		name: 'head',
 		id: 1,
-		displayName: 'button',
+		displayName: 'head',
 	},
 	2: {
-		name: 'input',
+		name: 'helmet',
 		id: 2,
-		displayName: 'input',
+		displayName: 'helmet',
 	},
 	3: {
-		name: 'select',
+		name: 'person',
 		id: 3,
-		displayName: 'select',
+		displayName: 'person',
 	},
 };

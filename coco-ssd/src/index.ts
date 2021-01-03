@@ -30,6 +30,28 @@ export interface DetectedObject {
 	score: number;
 }
 
+export interface TensorsConfig {
+	maxNumBoxes?: number;
+	minScore?: number;
+	scores?: {
+		index?: number;
+		shapePreIndex?: number;
+		shapeAfterIndex?: number;
+	};
+	boxes?: {
+		index?: number;
+		shapePreIndex?: number;
+		shapeAfterIndex?: number;
+	};
+}
+
+const initialTensorsConfig: TensorsConfig = {
+	maxNumBoxes: 20,
+	minScore: 0.5,
+	scores: { index: 1, shapePreIndex: 1, shapeAfterIndex: 2 },
+	boxes: { index: 0, shapePreIndex: 1, shapeAfterIndex: 2 },
+};
+
 /**
  * Coco-ssd model loading is configurable using the following config dictionary.
  *
@@ -46,7 +68,7 @@ export interface ModelConfig {
 	modelUrl?: string;
 }
 
-const BASE_PATH = 'https://storage.googleapis.com/tfjs-models/savedmodel/';
+// const BASE_PATH = 'https://storage.googleapis.com/tfjs-models/savedmodel/';
 
 export async function load(config: ModelConfig = {}) {
 	if (tf == null) {
@@ -75,18 +97,19 @@ export class ObjectDetection {
 	private model: tfconv.GraphModel;
 
 	constructor(base: ObjectDetectionBaseModel, modelUrl?: string) {
-		// http://localhost:8072/web_model/model.json
-		this.modelPath = modelUrl || `${BASE_PATH}${this.getPrefix(base)}/model.json`;
+		this.modelPath = modelUrl || 'http://localhost:8066/web_model/model.json';
+		// 'https://raw.githubusercontent.com/aisriver/tf-ui-detection/master/output/web_model/model.json';
+		// `${BASE_PATH}${this.getPrefix(base)}/model.json`;
 	}
 
-	private getPrefix(base: ObjectDetectionBaseModel) {
-		return base === 'lite_mobilenet_v2' ? `ssd${base}` : `ssd_${base}`;
-	}
+	// private getPrefix(base: ObjectDetectionBaseModel) {
+	// 	return base === 'lite_mobilenet_v2' ? `ssd${base}` : `ssd_${base}`;
+	// }
 
 	async load() {
 		this.model = await tfconv.loadGraphModel(this.modelPath);
 
-		const zeroTensor = tf.zeros([1, 300, 300, 3], 'int32');
+		const zeroTensor = tf.zeros([1, 640, 640, 3], 'int32');
 		// Warmup the model.
 		const result = (await this.model.executeAsync(zeroTensor)) as tf.Tensor[];
 		await Promise.all(result.map(t => t.data()));
@@ -107,9 +130,15 @@ export class ObjectDetection {
 	 */
 	private async infer(
 		img: tf.Tensor3D | ImageData | HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
-		maxNumBoxes: number,
-		minScore: number
+		tensorsConfig?: TensorsConfig
 	): Promise<DetectedObject[]> {
+		tensorsConfig = {
+			...initialTensorsConfig,
+			...tensorsConfig,
+			boxes: { ...initialTensorsConfig.boxes, ...(tensorsConfig.boxes || {}) },
+			scores: { ...initialTensorsConfig.scores, ...(tensorsConfig.scores || {}) },
+		};
+		const { maxNumBoxes, minScore } = tensorsConfig;
 		const batched = tf.tidy(() => {
 			if (!(img instanceof tf.Tensor)) {
 				img = tf.browser.fromPixels(img);
@@ -127,14 +156,31 @@ export class ObjectDetection {
 		// and 4 is the four coordinates of the box.
 		const result = (await this.model.executeAsync(batched)) as tf.Tensor[];
 
-		const scores = result[0].dataSync() as Float32Array;
-		const boxes = result[1].dataSync() as Float32Array;
+		// 0 1
+		// 0 2
+		// 3 5
+		// 0 5
+		// 1 0 3 4
+		const scores = result[tensorsConfig.scores.index].dataSync() as Float32Array;
+		const boxes = result[tensorsConfig.boxes.index].dataSync() as Float32Array;
+
+		const allData = result.map(data => data.dataSync());
+		console.log('allData', allData);
 
 		// clean the webgl tensors
 		batched.dispose();
 		tf.dispose(result);
 
-		const [maxScores, classes] = this.calculateMaxScores(scores, result[0].shape[1], result[0].shape[2]);
+		console.log('tensorsConfig', tensorsConfig);
+		console.log('result', result);
+		console.log('scores', scores);
+		console.log('boxes', boxes);
+		const [maxScores, classes] = this.calculateMaxScores(
+			scores,
+			result[tensorsConfig.scores.index].shape[tensorsConfig.scores.shapePreIndex],
+			result[tensorsConfig.scores.index].shape[tensorsConfig.scores.shapeAfterIndex]
+		);
+		console.log(maxScores, classes);
 
 		const prevBackend = tf.getBackend();
 		// run post process in cpu
@@ -142,11 +188,15 @@ export class ObjectDetection {
 			tf.setBackend('cpu');
 		}
 		const indexTensor = tf.tidy(() => {
-			const boxes2 = tf.tensor2d(boxes, [result[1].shape[1], result[1].shape[3]]);
+			const boxes2 = tf.tensor2d(boxes, [
+				result[tensorsConfig.boxes.index].shape[tensorsConfig.boxes.shapePreIndex],
+				result[tensorsConfig.boxes.index].shape[tensorsConfig.boxes.shapeAfterIndex],
+			]);
 			return tf.image.nonMaxSuppression(boxes2, maxScores, maxNumBoxes, minScore, minScore);
 		});
 
 		const indexes = indexTensor.dataSync() as Float32Array;
+		console.log('indexes', indexes);
 		indexTensor.dispose();
 
 		// restore previous backend
@@ -180,9 +230,10 @@ export class ObjectDetection {
 			bbox[1] = minY;
 			bbox[2] = maxX - minX;
 			bbox[3] = maxY - minY;
+			const classObj = CLASSES[classes[indexes[i]]];
 			objects.push({
 				bbox: bbox as [number, number, number, number],
-				class: CLASSES[classes[indexes[i]] + 1].displayName,
+				class: classObj ? classObj.displayName : '' + classes[indexes[i]],
 				score: scores[indexes[i]],
 			});
 		}
@@ -221,10 +272,9 @@ export class ObjectDetection {
 	 */
 	async detect(
 		img: tf.Tensor3D | ImageData | HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
-		maxNumBoxes = 20,
-		minScore = 0.5
+		tensorsConfig?: TensorsConfig
 	): Promise<DetectedObject[]> {
-		return this.infer(img, maxNumBoxes, minScore);
+		return this.infer(img, tensorsConfig);
 	}
 
 	/**
