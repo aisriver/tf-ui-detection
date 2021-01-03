@@ -6,6 +6,8 @@ node_modules/
 **/resnet101.ckpt-1.data-*
 **/ckpt-*.data-*
 **/variables.data-*
+**/model.ckpt.data-*
 **/.yalc
 __pycache__
 models
+tfrecords
