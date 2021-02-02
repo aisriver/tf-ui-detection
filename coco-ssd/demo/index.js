@@ -4,7 +4,7 @@
  * @作者: 廖军
  * @Date: 2020-12-20 22:57:30
  * @LastEditors: 廖军
- * @LastEditTime: 2021-01-03 17:30:49
+ * @LastEditTime: 2021-01-28 16:48:02
  */
 /**
  * @license
@@ -26,48 +26,56 @@ import * as cocoSsd from '@tensorflow-models/coco-ssd';
 import * as cpu from '@tensorflow/tfjs-backend-cpu';
 import * as webgl from '@tensorflow/tfjs-backend-webgl';
 
-import imageURL from './image8.jpg';
-import image2URL from './image9.jpg';
+import image15 from './images/image15.jpg';
+import image2 from './images/image2.jpg';
+import image10 from './images/image10.jpg';
+import image16 from './images/image16.jpg';
+import image11 from './images/image11.jpg';
+import image17 from './images/image11.jpg';
+import image20 from './images/image20.jpg';
 
 let modelPromise;
-let baseModel = 'lite_mobilenet_v2';
+const images = [image15, image2, image10, image16, image11, image17, image20];
 
 window.onload = () =>
 	(modelPromise = cocoSsd.load({
 		// modelUrl: 'https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/model.json',
+		// modelUrl: 'http://192.168.1.107:8066/web_model/model.json',
 	}));
 
-const button = document.getElementById('toggle');
-button.onclick = () => {
-	image.src = image.src.endsWith(imageURL) ? image2URL : imageURL;
+const c = document.getElementById('canvas');
+const context = c.getContext('2d');
+
+const select = document.getElementById('images');
+select.innerHTML = images.map((_, ind) => `<option value="${ind}">测试${ind + 1}</option>`).join('');
+select.onchange = async event => {
+	context.clearRect(0, 0, c.width, c.height);
+	image.src = images[event.srcElement.options[event.srcElement.selectedIndex].value];
 };
 
-// const select = document.getElementById('base_model');
-// select.onchange = async event => {
 // 	const model = await modelPromise;
 // 	model.dispose();
 // 	modelPromise = cocoSsd.load({
 // 		base: event.srcElement.options[event.srcElement.selectedIndex].value,
 // 		// modelUrl: 'https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/model.json',
 // 	});
-// };
 
 const image = document.getElementById('image');
-image.src = imageURL;
+image.src = images[0];
 
 const runButton = document.getElementById('run');
 runButton.onclick = async () => {
+	context.clearRect(0, 0, c.width, c.height);
 	const model = await modelPromise;
 	console.log('model loaded');
 	console.time('predict1');
 	const result = await model.detect(image, {
 		scores: { index: 1 },
 		boxes: { index: 0 },
+		minScore: 0.1,
 	});
 	console.timeEnd('predict1');
 
-	const c = document.getElementById('canvas');
-	const context = c.getContext('2d');
 	context.drawImage(image, 0, 0);
 	context.font = '10px Arial';
 

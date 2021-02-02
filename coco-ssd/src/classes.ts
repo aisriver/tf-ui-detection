@@ -4,7 +4,7 @@
  * @作者: 廖军
  * @Date: 2020-12-17 22:59:35
  * @LastEditors: 廖军
- * @LastEditTime: 2021-01-01 12:19:42
+ * @LastEditTime: 2021-01-26 13:52:09
  */
 /**
  * @license
@@ -30,34 +30,20 @@ export interface ObjectDetectionClass {
 }
 
 export const CLASSES: { [key: string]: ObjectDetectionClass } = {
-	// 1: {
-	// 	name: 'button',
-	// 	id: 1,
-	// 	displayName: 'button',
-	// },
-	// 2: {
-	// 	name: 'input',
-	// 	id: 2,
-	// 	displayName: 'input',
-	// },
-	// 3: {
-	// 	name: 'select',
-	// 	id: 3,
-	// 	displayName: 'select',
-	// },
-	1: {
-		name: 'head',
-		id: 1,
-		displayName: 'head',
-	},
-	2: {
-		name: 'helmet',
-		id: 2,
-		displayName: 'helmet',
-	},
-	3: {
-		name: 'person',
-		id: 3,
-		displayName: 'person',
-	},
+	'1': { name: 'button', id: 1, displayName: 'button' },
+	'2': { name: 'checkbox', id: 2, displayName: 'checkbox' },
+	'3': { name: 'datepicker', id: 3, displayName: 'datepicker' },
+	'4': { name: 'daterangepicker', id: 4, displayName: 'daterangepicker' },
+	'5': { name: 'input', id: 5, displayName: 'input' },
+	'6': { name: 'inputnumber', id: 6, displayName: 'inputnumber' },
+	'7': { name: 'progress', id: 7, displayName: 'progress' },
+	'8': { name: 'radio', id: 8, displayName: 'radio' },
+	'9': { name: 'rate', id: 9, displayName: 'rate' },
+	'10': { name: 'select', id: 10, displayName: 'select' },
+	'11': { name: 'slider', id: 11, displayName: 'slider' },
+	'12': { name: 'switch', id: 12, displayName: 'switch' },
+	'13': { name: 'table', id: 13, displayName: 'table' },
+	'14': { name: 'timepicker', id: 14, displayName: 'timepicker' },
+	'15': { name: 'timerangepicker', id: 15, displayName: 'timerangepicker' },
+	'16': { name: 'upload', id: 16, displayName: 'upload' },
 };
