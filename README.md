@@ -1,6 +1,8 @@
 ![tensorflow赋能前端](https://upload-images.jianshu.io/upload_images/19837079-5979487180789556.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-### 第一部分、引言 ######一、阅读本篇文章你能得到什么
+### 第一部分、引言
+
+###### 一、阅读本篇文章你能得到什么
 
 -   1、了解 tensorflow 及关键社区资源；
 -   2、能够自主训练和应用自己想要的模型（主要）；
